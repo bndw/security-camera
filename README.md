@@ -9,6 +9,7 @@ and sent to a Slack channel.
 - [Prerequisites](#prerequisites)
   - [Raspberry pi](#raspberry-pi)
   - [USB Webcam](#usb-webcam)
+  - [Golang](#golang)
 - [Device Setup](#device-setup)
   - [Install dependencies](#install-dependencies)
   - [Configure motion](#configure-motion)
@@ -37,6 +38,12 @@ be helpful for that.
 
 A USB webcam is used for this project. Any USB camera should do, I'm using a [Logitech C920 Webcam](https://www.amazon.com/gp/product/B006JH8T3S).
 
+## Golang
+
+You'll need a working Go environment on your local machine to build the code.
+
+* Go v1.11
+* [dep](https://github.com/golang/dep)
 
 # Device Setup
 
@@ -151,6 +158,7 @@ It's called by the `on_picture_save` script when a new image is created.
 The program uploads the image to S3 and then sends a webhook to Slack with the image url.
 
 ```
+make install
 make build
 ```
 

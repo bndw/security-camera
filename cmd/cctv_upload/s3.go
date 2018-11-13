@@ -32,22 +32,17 @@ func UploadToS3(region, bucket, filepath string) (string, error) {
 }
 
 func s3Put(s *session.Session, bucket, filepath, filename string) error {
-
-	// Open the file for use
 	file, err := os.Open(filepath)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	// Get file size and read the file content into a buffer
 	fileInfo, _ := file.Stat()
 	var size int64 = fileInfo.Size()
 	buffer := make([]byte, size)
 	file.Read(buffer)
 
-	// Config settings: this is where you choose the bucket, filename, content-type etc.
-	// of the file you're uploading.
 	_, err = s3.New(s).PutObject(&s3.PutObjectInput{
 		Bucket:             aws.String(bucket),
 		Key:                aws.String(filename),

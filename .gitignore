@@ -1,2 +1,3 @@
 bin/
+vendor/
 root/usr/local/bin/cctv_upload
