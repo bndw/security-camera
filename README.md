@@ -1,5 +1,7 @@
 # Security camera
 
+[![Build Status](https://travis-ci.org/bndw/security-camera.svg?branch=master)](https://travis-ci.org/bndw/security-camera)
+
 This is a guide to creating a simple motion sensing security camera using a Raspberry Pi, USB 
 webcam, Amazon S3, Slack. Anytime motion is detected images will be captured, uploaded to S3
 and sent to a Slack channel.

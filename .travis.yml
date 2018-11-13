@@ -1,0 +1,8 @@
+language: go
+go:
+  - 1.11
+  - tip
+install: 
+  - make install
+script:
+  - make build
