@@ -31,7 +31,7 @@
 
 [[constraint]]
   name = "github.com/satori/go.uuid"
-  version = "1.2.0"
+  revision = "b2ce2384e17bbe0c6d34077efa39dbab3e09123b"
 
 [prune]
   go-tests = true
