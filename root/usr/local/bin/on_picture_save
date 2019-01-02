@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# This script is invoked by motion for the on_picture_save event, providing the
+# path to the picture as an arguement.
+# This script invokes the cctv_upload program with that picture path, uploading
+# the image to S3 and notifying a Slack channel.
+#
+# Reference:
+# https://motion-project.github.io/motion_config.html#on_picture_save
+# https://api.slack.com/incoming-webhooks
+
+# Set your configuration here
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/your/slack/webhook
+S3_BUCKET_NAME=my-bucket-name
+S3_BUCKET_REGION=us-west-2
+AWS_ACCESS_KEY=xxx
+AWS_SECRET_KEY=xxxxx
+# End configuration
+
+IMAGE=$1
+CCTV_UPLOAD=/usr/local/bin/cctv_upload
+
+SLACK_WEBHOOK_URL="$SLACK_WEBHOOK_URL" \
+S3_BUCKET_NAME="$S3_BUCKET_NAME" \
+S3_BUCKET_REGION="$S3_BUCKET_REGION" \
+AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY" \
+AWS_SECRET_ACCESS_KEY="$AWS_SECRET_KEY" \
+$CCTV_UPLOAD" "$IMAGE"
