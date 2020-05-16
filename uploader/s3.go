@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/satori/go.uuid"
+	"github.com/google/uuid"
 )
 
 func UploadToS3(region, bucket, filepath string) (string, error) {
@@ -19,7 +19,7 @@ func UploadToS3(region, bucket, filepath string) (string, error) {
 	}
 
 	// Change the filename to a UUID
-	newFilename := fmt.Sprintf("%s.jpg", uuid.Must(uuid.NewV4()))
+	newFilename := fmt.Sprintf("%s.jpg", uuid.New())
 
 	// Upload it
 	err = s3Put(s, bucket, filepath, newFilename)
@@ -27,7 +27,6 @@ func UploadToS3(region, bucket, filepath string) (string, error) {
 		return "", err
 	}
 
-	// Return the URL
 	return fileURL(region, bucket, newFilename), nil
 }
 

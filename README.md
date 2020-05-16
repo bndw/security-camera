@@ -40,26 +40,15 @@ be helpful for that.
 
 A USB webcam is used for this project. Any USB camera should do, I'm using a [Logitech C920 Webcam](https://www.amazon.com/gp/product/B006JH8T3S).
 
-## Golang
-
-You'll need a working Go environment on your local machine to build the code.
-
-* Go v1.11
-* [dep](https://github.com/golang/dep)
-
 # Device Setup
 
 ## Install dependencies
 
-
 ```
-sudo apt-get update
+ssh pi@raspberrypi.local
 
-# usb camera support
-sudo apt-get install fswebcam
-
-# Install motion
-sudo apt-get install motion
+# usb camera support and motion
+sudo apt-get update -y && sudo apt-get install -y fswebcam motion
 ```
 
 Test the camera with `fswebcam`
@@ -77,8 +66,8 @@ Captured frame in 0.00 seconds.
 --- Processing captured image...
 Writing JPEG image to 'image.jpg'.
 ```
-Now we know our webcam is at `/dev/video0`. If you look at `image.jpg` you'll see the picture it took.
 
+Now we know our webcam is at `/dev/video0`. If you look at `image.jpg` you'll see the picture it took.
 
 ## Configure motion
 
@@ -125,7 +114,7 @@ to AWS S3 and notifying a Slack channel.
       "Version": "2012-10-17",
       "Statement": [
           {
-              "Sid": "cctv_upload",
+              "Sid": "securitycamera",
               "Effect": "Allow",
               "Action": [
                   "s3:PutObject",
@@ -144,9 +133,29 @@ to AWS S3 and notifying a Slack channel.
 
 # Uploading images
 
-Edit the `on_picture_save` script with your AWS and Slack secrets:
+When motion is detected a new image is created and the `on_picture_save` script is invoked. This calls the `uploader` which uploads the image to S3. Download the [latest release](https://github.com/bndw/security-camera/releases/latest) of the uploader and save it in `./root/usr/local/bin/uploader`.
+
+Or, build from source if you have Go 1.13 or later:
 ```
-# ./root/usr/local/bin/on_picture_save
+make build
+```
+
+Next, upload both programs to the pi
+```
+scp ./root/usr/local/bin/* pi@raspberrypi.local:/tmp/
+```
+
+SSH to the pi to complete configuration
+```
+ssh pi@raspberrypi.local
+
+# Copy the scripts into the PATH
+sudo mv /tmp/{uploader,on_picture_save} /usr/local/bin/
+```
+
+Edit `/usr/local/bin/on_picture_save` and add your AWS and Slack secrets:
+```
+# /usr/local/bin/on_picture_save
 
 SLACK_WEBHOOK_URL=https://hooks.slack.com/services/your/slack/webhook
 S3_BUCKET_NAME=my-bucket-name
@@ -155,25 +164,7 @@ AWS_ACCESS_KEY=xxx
 AWS_SECRET_KEY=xxxxx
 ```
 
-Build the [cctv_upload](./cmd/cctv_upload) program that ties the system together.
-It's called by the `on_picture_save` script when a new image is created. 
-The program uploads the image to S3 and then sends a webhook to Slack with the image url.
-
-```
-make install
-make build
-```
-
-Upload both programs to the pi
-```
-rsync -avz root/usr/local/bin/ pi@your_ip:/tmp
-
-cp /tmp/cctv_upload /usr/local/bin/
-cp /tmp/on_picture_save /usr/local/bin/
-```
-
-Finally, open the motion config again and configure it to call the `on_picture_save` script everytime it creates an image.
-
+Open the motion config again and configure it to call the `on_picture_save` script everytime it creates an image.
 ```
 # /etc/motion/motion.conf
 on_picture_save /usr/local/bin/on_picture_save %f
@@ -183,3 +174,5 @@ Restart motion
 ```
 systemctl restart motion
 ```
+
+You should be good to go. Check out the motion detection settings in `/etc/motion/motion.conf` for customizing thresholds, etc.
